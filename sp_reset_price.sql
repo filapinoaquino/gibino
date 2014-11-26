@@ -1,4 +1,4 @@
-use david
+--use david
 --begin stored procedure
 --exec sp_reset_price
 IF OBJECTPROPERTY(object_id('dbo.sp_reset_price'), N'IsProcedure') = 1
