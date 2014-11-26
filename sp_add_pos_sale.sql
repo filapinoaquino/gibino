@@ -1,5 +1,3 @@
---use david
---begin stored procedure
 /*
 EXEC sp_add_pos_sale @pro_id = 1, @pur_qty = 5, @cus_id = 4, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 3, @pur_qty = 2, @cus_id = 1, @pos_paid = 1;
@@ -9,7 +7,6 @@ EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 25, @cus_id = 5, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 25, @cus_id = 900, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 1000, @cus_id = 3, @pos_paid = 0;
 */
---select * from t_cus_age
 IF OBJECTPROPERTY(object_id('dbo.sp_add_pos_sale'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_add_pos_sale]
 GO
@@ -48,16 +45,8 @@ IF exists(select * from t_customer where cus_id = @cus_id)
 				set pro_instock = (pro_instock - @pur_qty)
 				where pro_id = @pro_id;
 				END
-			ELSE
-				print 'There is insufficient amount of this product available for this purchase!'
-				--ROLLBACK TRANSACTION;
-		ELSE
-			print 'Sorry, this person is not of age!'
-			--rollback transaction;
 	END
-	ELSE
-		PRINT 'INVALID CUSTOMER'
-		--ROLLBACK TRANSACTION;
+
 END TRY
 BEGIN CATCH
     SELECT 
