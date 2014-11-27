@@ -1,0 +1,51 @@
+--Adds a valid product to the system / should run OK
+-- use gibino execute sp_add_product 'Michelob Light',0,1,4.50
+
+--Attempts to add an existing product to the system / should fail
+-- use gibino execute sp_add_product 'TB-Uni Lager',0,1,4.50
+
+--Attempts to add product with invalid type / should fail
+-- use gibino execute sp_add_product 'USB Draft',0,45,4.50
+
+
+drop procedure sp_add_product
+go
+
+create procedure sp_add_product
+(@pro_name varchar(30), @pro_instock int, @ty_id int, @pro_base numeric(5,2))
+as
+begin
+
+--Checks for duplicate product names
+if exists (select * from t_product where upper(pro_name)=upper(@pro_name))
+	begin
+		select @pro_name, 'already exsists in this system as a product.'
+		return
+end
+else
+
+--NEED Checks that type is valid
+if not exists (select * from t_type where upper(ty_id)=upper(@ty_id))
+	begin
+		select @pro_name, 'was not given a valid type.'
+		return
+end
+
+--inserts product data into t_product table
+begin transaction
+	 insert into t_product
+	(pro_name, pro_instock, ty_id, pro_base)
+	 values
+	(@pro_name, @pro_instock, @ty_id, @pro_base)
+
+if @@error<>0
+	begin
+		rollback transaction
+		select 'Product ', @pro_name, ' not added'
+		return
+	end
+commit transaction
+
+select   'Product ', @pro_name, ' was added'
+
+end
