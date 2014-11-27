@@ -1,0 +1,42 @@
+--Add new vendor / should pass
+--execute sp_add_vendor 'A new Vendor Name','5852 gYork Road','apt46','Towson','MD',21252,'443-458-8522','towson@gmail.com','Lisa Howard'
+
+--Add exisitng vendor / should fail
+--execute sp_add_vendor 'TOWSON BREW GUYS','5852 gYork Road','apt46','Towson','MD',21252,'443-458-8522','towson@gmail.com','Lisa Howard'
+
+drop procedure sp_add_vendor
+go
+
+create procedure sp_add_vendor
+(@ven_name varchar(30),@ven_street1 varchar(30), @ven_street2 varchar(30), @ven_city varchar(30) , @ven_state char(2),
+@ven_zip numeric(5,0), @ven_phone varchar(12), @ven_email varchar(50),@ven_contact varchar(50))
+as
+begin
+
+--Checks for duplicate vendor names
+if exists (select * from t_vendor where upper(ven_name)=upper(@ven_name))
+	begin
+		select @ven_name, 'already exsists in this system as a vendor'
+		return
+end
+
+--Inserts vendor information into t_vendor table
+begin transaction
+	 insert into t_vendor
+	(ven_name,ven_street1, ven_street2, ven_city, ven_state,
+	ven_zip, ven_phone, ven_email, ven_contact)
+	 values
+	 (@ven_name,@ven_street1, @ven_street2, @ven_city, @ven_state,
+	@ven_zip, @ven_phone, @ven_email, @ven_contact)
+
+if @@error<>0
+	begin
+		rollback transaction
+		select 'Vendor ', @ven_name, ' not added'
+		return
+	end
+commit transaction
+
+select   'Vendor ', @ven_name, ' was added'
+
+end
