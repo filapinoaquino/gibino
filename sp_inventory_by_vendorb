@@ -1,0 +1,29 @@
+--Tests inventory for valid vendor / should run OK
+--use gibino exec sp_inventory_by_vendor 2
+
+--Tests inventory for non-existent vendor / should fail
+--use gibino exec sp_inventory_by_vendor 5345
+
+drop procedure sp_inventory_by_vendor
+go
+
+create procedure sp_inventory_by_vendor
+(@ven_id int)
+as begin
+
+--Checks that vendor exists
+if exists (select * from t_vendor where ven_id=@ven_id)
+	begin 
+		select v.ven_name as Vendor, p.pro_name as Product, p.pro_instock as Inventory
+		from t_vendor v left join t_product p on v.ven_id = p.ven_id
+		where v.ven_id=@ven_id
+		order by Vendor, Product
+		return
+	end
+else 
+
+	begin
+		select @ven_id, 'is not a valid vendor.'
+		return
+	end
+end
