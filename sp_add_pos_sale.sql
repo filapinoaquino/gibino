@@ -64,8 +64,12 @@ IF exists(select * from t_product where pro_id=@pro_id and ty_id in (select ty_i
 
 BEGIN TRANSACTION
 
+select @pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id);
+select * from dbo.t_price;
+
 insert into dbo.t_pos_sales(pos_qty, cus_id, pro_id, pos_paid, pro_price) 
 values(@pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id));
+
 
 update t_product
 set pro_instock = (pro_instock - @pur_qty)
