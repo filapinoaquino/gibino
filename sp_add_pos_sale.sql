@@ -6,6 +6,7 @@ EXEC sp_add_pos_sale @pro_id = 5, @pur_qty = 10, @cus_id = 3, @pos_paid = 0;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 25, @cus_id = 5, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 25, @cus_id = 900, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 1000, @cus_id = 3, @pos_paid = 0;
+EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 0, @cus_id = 3, @pos_paid = 0;
 */
 IF OBJECTPROPERTY(object_id('dbo.sp_add_pos_sale'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_add_pos_sale]
@@ -26,6 +27,15 @@ IF not exists(select * from t_customer where cus_id = @cus_id)
 		select 'This customer does not exist!'
 		return
 	end
+
+/*  VALIDATE CUSTOMER   */
+
+IF @pur_qty <= 0
+	begin
+		select 'This is not a valid purchase amount!'
+		return
+	end
+
 
 /*  VALIDATE SUFFICIENT INVENTORY   */
 
