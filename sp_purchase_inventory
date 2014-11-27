@@ -1,0 +1,62 @@
+--Purchase legitimate inventory / should work
+--use gibino exec sp_purchase_inventory 2,1,425,3.5,'2014-11-26 14:50:20.937'
+
+--Purchase inventory 0 qauntity / should fail
+--use gibino exec sp_purchase_inventory 2,1,0,3.5,'2014-11-26 14:50:20.937'
+
+--Purchase invalid item / should fail
+--use gibino exec sp_purchase_inventory 55564,1,55,3.5,'2014-11-26 14:50:20.937'
+
+use gibino
+go
+
+drop procedure sp_purchase_inventory
+go
+
+create procedure sp_purchase_inventory
+(@pro_id int, @ven_id int, @pur_qty int, @pur_unt_price	numeric(5,2), @pur_date	datetime)
+as
+begin
+
+--Checks that vendor and product exist in t_product
+if not exists (select * from t_product where ven_id=@ven_id and pro_id=@pro_id)
+	begin
+		select 'Vendor and product do not exist in the product table'
+		return
+end
+else
+
+--Checks that quantity purchase is >0
+if @pur_qty <=0
+	begin
+		select 'A quantity greater than 0 must be purchased.'
+		return
+end
+
+
+
+--Inserts values into purchase table
+begin transaction
+	 insert into t_purchase
+	 (pro_id, ven_id, pur_qty, pur_unt_price, pur_date)
+	 values
+	 (@pro_id, @ven_id, @pur_qty, @pur_unt_price, @pur_date);
+	update t_product
+	set pro_instock=pro_instock+@pur_qty
+	where pro_id=@pro_id
+	 
+if @@error<>0
+	begin
+		rollback transaction
+		select 'Purchase was not completed.'
+		return
+	end
+commit transaction
+
+select   'Purchase successfully added for ', @pur_qty, 'units of ', @pro_id, ' at ', @pur_unt_price, ' each.'
+
+end
+
+
+
+
