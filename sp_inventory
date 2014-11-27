@@ -1,0 +1,30 @@
+--Inventory for valid product / should work OK
+--use gibino execute sp_inventory 3
+
+--Inventory for invalid product / should fail
+--use gibino execute sp_inventory 555
+
+drop procedure sp_inventory
+go
+
+create procedure sp_inventory
+(@pro_id int)
+as begin
+
+--Checks that vendor exists
+if exists (select * from t_product where pro_id=@pro_id)
+	begin 
+		select p.pro_name as Product, p.pro_instock as Inventory, p.pro_base as BasePrice, t.ty_description, t.ty_restricted, v.ven_name as Vendor
+		from t_product p left join  t_vendor v on p.ven_id = v.ven_id
+		left join t_type t on p.ty_id=t.ty_id
+		where p.pro_id=@pro_id
+		order by t.ty_restricted, t.ty_description, p.pro_name
+		return
+	end
+else 
+
+	begin
+		select @pro_id, 'is not a valid product.'
+		return
+	end
+end
