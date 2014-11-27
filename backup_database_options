@@ -1,0 +1,16 @@
+use gibino
+go
+
+--Sets database to simple recovery mode
+--alter database gibino set recovery simple;
+
+--This does a "COPY ONLY" backup. It should be used when making a one-off backup
+-- It will not interfere with the relationship between the full and differential backups
+-- backup database gibino to disk = 'C:\backups\GIBINO_ADHOC.bak' with copy_only;
+
+--Does a full database backup / scheduled to run daily at 4AM / differential backups use this as their base
+-- backup database gibino to disk = 'C:\backups\GIBINO_FULL.bak';
+
+--Does a differential backup (only backups changes since most recent full backup) / schedule to run every fifteen minuts
+-- backup database gibino to disk = 'C:\backups\GIBINO_DIFFERENTIAL.bak' with differential;
+
