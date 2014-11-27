@@ -1,0 +1,29 @@
+--Displays information for a valid vendor / should work OK
+--use gibino exec sp_display_all_vendors 2
+
+--Displays information for an invalid vendor / should fail
+--use gibino exec sp_display_all_vendors 22342
+
+drop procedure sp_display_all_vendors
+go
+
+create procedure sp_display_all_vendors
+(@ven_id int)
+as begin
+
+--Checks that vendor exists
+if exists (select * from t_vendor where ven_id=@ven_id)
+	begin 
+		select *
+		from t_vendor
+		where ven_id=@ven_id
+		order by ven_name
+		return
+	end
+else 
+
+	begin
+		select @ven_id, 'is not a valid vendor.'
+		return
+	end
+end
