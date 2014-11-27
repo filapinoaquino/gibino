@@ -1,0 +1,32 @@
+Use GIBINO
+IF OBJECT_ID('dbo.t_tmp_sales_30', 'U') IS NOT NULL
+drop table dbo.t_tmp_sales_30
+go
+
+IF OBJECT_ID('dbo.t_tmp_inv_remain', 'U') IS NOT NULL
+drop table dbo.t_tmp_inv_remain
+go
+
+--create temporary table showing average sales for past thirty days
+select a.pro_id, sum(a.acct_qty)/30 as dailysold into t_tmp_sales_30
+from t_acct_sales a 
+where a.acct_datetime >= dateadd (day,-10000, getdate() )
+group by a.pro_id
+go
+
+--create temporary table showing amount on hand, given current inventory
+select p.pro_id, p.pro_name, p.pro_instock/nullif(s.dailysold,0) as invdays, s.dailysold, p.pro_instock into t_tmp_inv_remain
+from t_product p left join t_tmp_sales_30 s 
+on p.pro_id=s.pro_id
+go
+
+select inv_message =
+case 
+when inv.pro_instock = 0 then 'There is no' +inv.pro_name+ ' in stock. The average daily sales are '+cast(dailysold as varchar)
+when inv.invdays is NULL then 'Not enough sales information to determine amount of ' + cast(inv.pro_name as varchar) + ' in stock. There are currently ' + cast(inv.pro_instock as varchar) + ' in stock.'
+else cast(inv.invdays as varchar)+' days (estimated) of'+inv.pro_name+ ' product remain'
+end
+from
+t_tmp_inv_remain inv
+order by inv_message
+go
