@@ -1,8 +1,8 @@
---exec sp_reset_price
-IF OBJECTPROPERTY(object_id('dbo.sp_reset_price'), N'IsProcedure') = 1
-DROP PROCEDURE [dbo].[sp_reset_price]
+--exec sp_update_price
+IF OBJECTPROPERTY(object_id('dbo.sp_update_price'), N'IsProcedure') = 1
+DROP PROCEDURE [dbo].[sp_update_price]
 GO
-CREATE PROCEDURE dbo.sp_reset_price
+CREATE PROCEDURE dbo.sp_update_price
 AS 
 BEGIN 
 BEGIN TRANSACTION
