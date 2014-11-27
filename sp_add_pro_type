@@ -1,0 +1,39 @@
+--TEST Insert existing type / should fail
+--use gibino execute sp_add_pro_type '16 OZ BEER BOTTLE', 0
+
+--TEST Insert existing type / should pass
+--use gibino execute sp_add_pro_type '48 OZ BEER BOTTLE', 0
+
+drop procedure sp_add_pro_type
+go
+
+create procedure sp_add_pro_type
+(@ty_description varchar(50), @ty_restricted int)
+as
+begin
+
+--Checks for duplicate product type
+if exists (select * from t_type where upper(ty_description)=upper(@ty_description))
+	begin
+		select @ty_description, 'already exsists as a product type in the system.'
+		return
+end
+
+--Inserts vendor information into t_vendor table
+begin transaction
+	 insert into t_type
+	(ty_description, ty_restricted)
+	 values
+	(@ty_description, @ty_restricted)
+
+if @@error<>0
+	begin
+		rollback transaction
+		select @ty_description, ' not added to the system.'
+		return
+	end
+commit transaction
+
+select @ty_description, ' was successfully added to the system.'
+
+end
