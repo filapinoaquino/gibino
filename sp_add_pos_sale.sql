@@ -17,12 +17,29 @@ CREATE PROCEDURE dbo.sp_add_pos_sale
 @pos_paid INT
 AS-- Logic Comes Here
 --checks that product exists in inventory
-BEGIN TRANSACTION;
-BEGIN TRY
---CHECK FOR EXISTING CUSTOMER
-IF exists(select * from t_customer where cus_id = @cus_id)
+BEGIN
+
+/*  VALIDATE CUSTOMER   */
+
+IF not exists(select * from t_customer where cus_id = @cus_id)
+	begin
+		select 'This customer does not exist!'
+		return
+	end
+
+/*  VALIDATE SUFFICIENT INVENTORY   */
+
+IF not exists(select * from dbo.t_product where pro_id=@pro_id and pro_instock>=@pur_qty)
+	begin
+		select 'We do not have enough of this product in stock. The amount in stock is', (select pro_instock from t_product where pro_id=@pro_id)
+		return
+	end
+
+/*  VALIDATE AGE FOR RESTRICTED ITEM  */
+IF exists(select * from t_product where pro_id=@pro_id and ty_id in (select ty_id from t_type where ty_restricted=1))
 	BEGIN
 		--CHECK FOR CUSTOMER AGE
+		BEGIN TRANSACTION
 		IF OBJECT_ID('dbo.t_cus_age', 'U') IS NOT NULL
 		drop table dbo.t_cus_age
 		create table dbo.t_cus_age
@@ -35,32 +52,35 @@ IF exists(select * from t_customer where cus_id = @cus_id)
 		INSERT INTO T_CUS_AGE(CUS_ID, AGE)
 		select cus_id, DATEDIFF(hour, cus_dob, GETDATE())/8766 AS AgeInYears from t_customer;
 
-		IF not exists(select * from t_cus_age a inner join t_customer c on a.cus_id = c.cus_id where age < 21 and a.cus_id = @cus_id)
-			IF exists(select * from dbo.t_product where pro_id=@pro_id and pro_instock>=@pur_qty)
-				BEGIN
-				insert into dbo.t_pos_sales(pos_qty, cus_id, pro_id, pos_paid, pro_price) 
-				values(@pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id));
-
-				update t_product
-				set pro_instock = (pro_instock - @pur_qty)
-				where pro_id = @pro_id;
-				END
+		IF not exists(select * from t_cus_age a 
+				inner join t_customer c on a.cus_id = c.cus_id 
+				where age < 21 and a.cus_id = @cus_id)
+		begin
+			ROLLBACK TRANSACTION
+			select 'Alcoholic beverages can only be purchased by customers who are 21 years of age or older'
+			return
+		end
 	END
 
-END TRY
-BEGIN CATCH
-    SELECT 
-        ERROR_NUMBER() AS ErrorNumber
-        ,ERROR_SEVERITY() AS ErrorSeverity
-        ,ERROR_STATE() AS ErrorState
-        ,ERROR_PROCEDURE() AS ErrorProcedure
-        ,ERROR_LINE() AS ErrorLine
-        ,ERROR_MESSAGE() AS ErrorMessage;
+BEGIN TRANSACTION
 
-    IF @@TRANCOUNT > 0
-        ROLLBACK TRANSACTION;
-END CATCH;
+insert into dbo.t_pos_sales(pos_qty, cus_id, pro_id, pos_paid, pro_price) 
+values(@pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id));
 
-IF @@TRANCOUNT > 0
-    COMMIT TRANSACTION;
-GO
+update t_product
+set pro_instock = (pro_instock - @pur_qty)
+where pro_id = @pro_id;
+
+if @@error <> 0
+
+	begin
+		rollback transaction
+		select ' Sale was not completed'
+		return
+	end
+
+commit transaction
+
+select   'Sold ', @pur_qty, 'units of ', (select pro_name from t_product where pro_id = @pro_id), ' at ', (select pro_price from t_price where pro_id = @pro_id), ' each.'
+
+END
