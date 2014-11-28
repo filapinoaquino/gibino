@@ -1,0 +1,49 @@
+--Add new customer / should pass
+--exec sp_add_customer '1947-01-01 00:00:00.000','5588 York Road','','Towson','MD',21252,'jdoe@gmail.com','Jane','Doe','','PhD'
+
+
+
+--Add exisitng customer / should fail
+--exec sp_add_customer '1980-01-01 00:00:00.000','ABC Bld.','','Baltimore','MD',21239,'samdan@yahoo.com','Sam','Daniel','',''
+
+
+
+drop procedure sp_add_customer
+go
+
+create procedure sp_add_customer
+(@cus_dob datetime, @cus_street1 varchar(30), @cus_street2 varchar(30), @cus_city varchar(30), @cus_state char(2), @cus_zip numeric(5,0),
+@cus_email varchar(50), @cus_fname varchar(25), @cus_lname varchar(30), @cus_mi varchar(1), @cus_suffix varchar(5))
+as
+begin
+
+--Checks for duplicate customer names with the same date of birth
+if exists (
+select * from t_customer where ltrim(rtrim(upper(cus_fname)))=ltrim(rtrim(upper(@cus_fname)))
+and ltrim(rtrim(upper(cus_lname)))=ltrim(rtrim(upper(@cus_lname)))
+and cast(cus_dob as date)=cast(@cus_dob as date)
+)
+	begin
+		select @cus_fname, @cus_lname, 'already exsists in this system as a customer.'
+		return
+end
+
+--Inserts vendor information into t_customer table
+begin transaction
+	 insert into t_customer
+	(cus_dob, cus_street1, cus_street2, cus_city, cus_state, cus_zip,
+cus_email, cus_fname, cus_lname, cus_mi, cus_suffix)
+	 values
+(@cus_dob, @cus_street1, @cus_street2, @cus_city, @cus_state, @cus_zip,
+@cus_email, @cus_fname, @cus_lname, @cus_mi, @cus_suffix)
+
+if @@error<>0
+	begin
+		rollback transaction
+		select 'Customer, ', @cus_fname, @cus_lname, ' not added.'
+		return
+	end
+
+commit transaction
+select 'Customer, ', @cus_fname, @cus_lname, ' was added.'
+end
