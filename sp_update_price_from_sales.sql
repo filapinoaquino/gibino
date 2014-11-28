@@ -74,6 +74,7 @@ if @@error <> 0
 		return
 	end
 
-commit transaction
+commit transaction;
 SELECT * FROM T_PRICE;
+
 END

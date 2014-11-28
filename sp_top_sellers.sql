@@ -7,9 +7,10 @@ AS
 BEGIN
 
 select top 3 pro_name, max(pos_qty) as TopSeller
-from t_pos_sales inner join t_product 
+from t_pos_sales s 
+inner join t_product p on p.pro_id = s.pro_id
 where Day(pos_datetime) = Day(GetDate())
-group by pro_id
+group by p.pro_id, pro_name
 order by TopSeller desc;
 
 END

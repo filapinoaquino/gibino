@@ -12,7 +12,6 @@ SET pri.pro_price = pro.pro_base
 FROM t_price pri INNER JOIN t_product pro
 on pri.pro_id = pro.pro_id;
 
-SELECT * FROM T_PRODUCT;
 if @@error <> 0
 
 	begin
@@ -22,4 +21,5 @@ if @@error <> 0
 	end
 
 commit transaction
+SELECT * FROM T_PRICE;
 END
