@@ -6,7 +6,10 @@ EXEC sp_add_pos_sale @pro_id = 5, @pur_qty = 10, @cus_id = 3, @pos_paid = 0;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 25, @cus_id = 5, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 25, @cus_id = 900, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 1000, @cus_id = 3, @pos_paid = 0;
-EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 0, @cus_id = 3, @pos_paid = 0;
+EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 1, @cus_id = 3, @pos_paid = 0;
+EXEC sp_add_pos_sale @pro_id = 6, @pur_qty = 25, @cus_id = 1, @pos_paid = 1;
+EXEC sp_add_pos_sale @pro_id = 7, @pur_qty = 5, @cus_id = 2, @pos_paid = 1;
+EXEC sp_add_pos_sale @pro_id = 8, @pur_qty = 10, @cus_id = 3, @pos_paid = 1;
 */
 IF OBJECTPROPERTY(object_id('dbo.sp_add_pos_sale'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_add_pos_sale]
@@ -70,12 +73,13 @@ IF exists(select * from t_product where pro_id=@pro_id and ty_id in (select ty_i
 			select 'Alcoholic beverages can only be purchased by customers who are 21 years of age or older'
 			return
 		end
+		commit transaction
 	END
 
 BEGIN TRANSACTION
 
-select @pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id);
-select * from dbo.t_price;
+--select @pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id);
+--select * from dbo.t_price;
 
 insert into dbo.t_pos_sales(pos_qty, cus_id, pro_id, pos_paid, pro_price) 
 values(@pur_qty, @cus_id, @pro_id, @pos_paid, (select pro_price from dbo.t_price where pro_id = @pro_id));
