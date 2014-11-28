@@ -19,6 +19,8 @@ IF OBJECT_ID('dbo.t_sales_info', 'U') IS NOT NULL
 drop table dbo.t_sales_info
 IF OBJECT_ID('dbo.t_purchase', 'U') IS NOT NULL
 drop table dbo.t_purchase
+IF OBJECT_ID('dbo.t_price_diff', 'U') IS NOT NULL
+drop table dbo.t_price_diff
 IF OBJECT_ID('dbo.t_product', 'U') IS NOT NULL
 drop table dbo.t_product
 IF OBJECT_ID('dbo.t_vendor', 'U') IS NOT NULL
