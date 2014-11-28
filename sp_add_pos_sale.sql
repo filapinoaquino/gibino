@@ -10,6 +10,7 @@ EXEC sp_add_pos_sale @pro_id = 4, @pur_qty = 1, @cus_id = 3, @pos_paid = 0;
 EXEC sp_add_pos_sale @pro_id = 6, @pur_qty = 25, @cus_id = 1, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 7, @pur_qty = 5, @cus_id = 2, @pos_paid = 1;
 EXEC sp_add_pos_sale @pro_id = 8, @pur_qty = 10, @cus_id = 3, @pos_paid = 1;
+EXEC sp_add_pos_sale @pro_id = 8, @pur_qty = 0, @cus_id = 1, @pos_paid = 1;
 */
 IF OBJECTPROPERTY(object_id('dbo.sp_add_pos_sale'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_add_pos_sale]
@@ -22,6 +23,13 @@ CREATE PROCEDURE dbo.sp_add_pos_sale
 AS-- Logic Comes Here
 --checks that product exists in inventory
 BEGIN
+/*  VALIDATE CUSTOMER   */
+
+IF not exists(select * from t_product where pro_id = @pro_id)
+	begin
+		select 'This product does not exist!'
+		return
+	end
 
 /*  VALIDATE CUSTOMER   */
 
@@ -99,6 +107,7 @@ if @@error <> 0
 
 commit transaction
 
+select * from t_pos_sales;
 select   'Sold ', @pur_qty, 'units of ', (select pro_name from t_product where pro_id = @pro_id), ' at ', (select pro_price from t_price where pro_id = @pro_id), ' each.'
 
 END
