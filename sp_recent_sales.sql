@@ -6,8 +6,9 @@ CREATE PROCEDURE dbo.sp_recent_sales
 AS 
 BEGIN
 
-select pro_id, pro_price 
-from t_pos_sales 
+select pro_name as Product, pro_price as PriceSold, pos_datetime as TimeOfSale 
+from t_pos_sales s 
+inner join t_product p on p.pro_id = s.pro_id 
 where pos_datetime > DateAdd(Hour, -1, GETDATE()) and pos_datetime < GETDATE(); 
 
 END 
