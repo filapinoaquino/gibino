@@ -21,6 +21,7 @@ if @@error <> 0
 		return
 	end
 
-commit transaction
+commit transaction;
 
+SELECT * FROM T_ACCT_SALES;
 END
