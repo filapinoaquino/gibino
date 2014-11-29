@@ -1,9 +1,16 @@
 use gibino
+
 --t_customer
 insert into dbo.t_customer values ( 
-'1999-01-01 00:00:00.000','123 York Road','','Towson','MD',21252,'joesmith@gmail.com','Joe','Smith','','Dr.')
+'1995-01-01 00:00:00.000','123 York Road','','Towson','MD',21252,'joesmith@gmail.com','Joe','Smith','','Dr.')
 insert into dbo.t_customer values ( 
-'1980-01-01 00:00:00.000','ABC Bld.','','Baltimore','MD',21239,'samdan@yahoo.com','Sam','Daniel','','')
+'1980-01-01 00:00:00.000','456 ABC Bld.','','Baltimore','MD',21239,'samdan@yahoo.com','Sam','Daniel','','')
+insert into dbo.t_customer values ( 
+'1950-01-01 00:00:00.000','789 Old Terrace','','Baltimore','MD',21239,'howdee.com','Daggly','Howard','','')
+insert into dbo.t_customer values ( 
+'1962-01-01 00:00:00.000','7778 Route 99','','Baltimore','MD',21239,'freddy@yahoo.com','Hoord','Fred','','')
+insert into dbo.t_customer values ( 
+'1978-01-01 00:00:00.000','3435 Joppa Road','','Baltimore','MD',21239,'jlanen@yahoo.com','Lane','Jane','','')
 
 --t_vendor
 Insert into dbo.t_vendor values ('TOWSON BREW GUYS','5852 York Road','','Towson','MD',21252,'443-458-8522','towson@gmail.com','Lisa Howard')
@@ -14,6 +21,8 @@ Insert into dbo.t_vendor values ('MONASTIC LAGER COMPANY','123 Monastery Road.',
 --t_type
 Insert into dbo.t_type values ('16 OZ BEER BOTTLE',1)
 Insert into dbo.t_type values ('12 OZ SODA CAN',0)
+Insert into dbo.t_type values ('64 OZ BEER GROWLER',1)
+Insert into dbo.t_type values ('12 OZ BEER CAN',1)
 
 --t_product
 Insert into dbo.t_product values ('TB-Tiger Tail Ale',0,1,4.50, 1)
@@ -29,21 +38,39 @@ Insert into dbo.t_product values ('GB-Ale',20,1,5.00, 3)
 
 --t_sales info
 Insert into dbo.t_sales_info values (1,15)
-Insert into dbo.t_sales_info values (2,8)
+Insert into dbo.t_sales_info values (2,4)
+Insert into dbo.t_sales_info values (3,1)
+Insert into dbo.t_sales_info values (2,3)
+Insert into dbo.t_sales_info values (3,11)
+Insert into dbo.t_sales_info values (1,4)
 
 --t_sales_perc
-Insert into dbo.t_sales_perc values (1,'')
-Insert into dbo.t_sales_perc values (2,'')
+Insert into dbo.t_sales_perc values (1,20)
+Insert into dbo.t_sales_perc values (2,40)
+Insert into dbo.t_sales_perc values (3,10)
+Insert into dbo.t_sales_perc values (5,5)
+Insert into dbo.t_sales_perc values (6,20)
+Insert into dbo.t_sales_perc values (7,5)
+
+
 
 --t_price
-Insert into dbo.t_price values (1,5.50)
-Insert into dbo.t_price values (2,4.00)
+Insert into dbo.t_price values (4,5.50)
+Insert into dbo.t_price values (2,6.00)
+Insert into dbo.t_price values (3,5.00)
+Insert into dbo.t_price values (5,5.75)
+Insert into dbo.t_price values (2,5.25)
+Insert into dbo.t_price values (6,5.00)
+Insert into dbo.t_price values (3,6.00)
+Insert into dbo.t_price values (1,4.50)
+Insert into dbo.t_price values (7,4.75)
 
 --t_pos_sales
-Insert into dbo.t_pos_sales values (11/06/14,15,2,1,5.50,1)
-Insert into dbo.t_pos_sales values (11/11/14,8,1,2,4.00,1)
-Insert into dbo.t_pos_sales values (11/11/14,8,1,2,4.00,0)
-Insert into dbo.t_pos_sales values (11/11/14,7,2,3,5.00,0)
+Insert into dbo.t_pos_sales values (getdate(),15,2,1,5.50,1)
+Insert into dbo.t_pos_sales values (getdate(),8,1,2,4.00,1)
+Insert into dbo.t_pos_sales values (getdate(),8,1,2,4.00,0)
+Insert into dbo.t_pos_sales values (getdate(),7,2,3,5.00,0)
+Insert into dbo.t_pos_sales values (getdate(),12,2,3,5.00,0)
 
 --t_acct_sales
 Insert into t_acct_sales values ('2014-11-23 17:25:02.650',40,2,1,5.50)
