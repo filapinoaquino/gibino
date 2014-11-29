@@ -1,4 +1,5 @@
 --exec sp_update_acct_sales
+/* CHECK IF PROCEDURE EXISTS, DROP AND RECREATE IT */
 IF OBJECTPROPERTY(object_id('dbo.sp_update_acct_sales'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_update_acct_sales]
 GO

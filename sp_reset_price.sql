@@ -1,4 +1,5 @@
 --exec sp_reset_price
+/* CHECK IF PROCEDURE EXISTS, DROP AND RECREATE IT */
 IF OBJECTPROPERTY(object_id('dbo.sp_reset_price'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_reset_price]
 GO

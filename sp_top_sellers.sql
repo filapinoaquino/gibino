@@ -1,4 +1,5 @@
 --exec sp_top_sellers
+/* CHECK IF PROCEDURE EXISTS, DROP AND RECREATE IT */
 IF OBJECTPROPERTY(object_id('dbo.sp_top_sellers'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_top_sellers]
 GO
