@@ -4,28 +4,29 @@ DROP PROCEDURE [dbo].[sp_customer_tab]
 GO
 CREATE PROCEDURE dbo.sp_customer_tab
 @cus_id INT
-As
-Begin
-	If not exists (Select * from T_CUSTOMER where cus_id = @cus_id)
-		begin
-			select 'Invalid Customer!'
-			return
-		end
+AS
+BEGIN
+	/* ROLLBACK IF AN ERROR HAS OCCURRED */
+	IF NOT EXISTS (SELECT * FROM T_CUSTOMER WHERE cus_id = @cus_id)
+		BEGIN
+			SELECT 'Invalid Customer!'
+			RETURN
+		END
+	/* ITEMIZED LIST OF UNPAID ITEMS */
+	SELECT pro.pro_name, s.pro_price, s.pos_qty
+	FROM t_customer c 
+	INNER JOIN t_pos_sales s ON c.cus_id=s.cus_id 
+	INNER JOIN t_product pro ON pro.pro_id=s.pro_id
+	WHERE s.pos_paid=0
+	AND s.cus_id = @cus_id
 
-	Select pro.pro_name, s.pro_price, s.pos_qty
-	from t_customer c 
-	inner join t_pos_sales s on c.cus_id=s.cus_id 
-	inner join t_product pro on pro.pro_id=s.pro_id
-	where s.pos_paid=0
-	and s.cus_id = @cus_id
+	/* CUSTOMER NAME AND SUBTOTAL */
+	SELECT c.cus_fname, c.cus_lname,sum(s.pro_price) AS SubTotal
+	FROM t_customer c 
+	INNER JOIN t_pos_sales s ON c.cus_id=s.cus_id 
+	INNER JOIN t_product pro ON pro.pro_id=s.pro_id
+	WHERE s.pos_paid=0
+	AND s.cus_id = @cus_id
+	GROUP BY c.cus_id,c.cus_fname, c.cus_lname
 
-
-	Select c.cus_fname, c.cus_lname,sum(s.pro_price) As SubTotal
-	from t_customer c 
-	inner join t_pos_sales s on c.cus_id=s.cus_id 
-	inner join t_product pro on pro.pro_id=s.pro_id
-	where s.pos_paid=0
-	and s.cus_id = @cus_id
-	group by c.cus_id,c.cus_fname, c.cus_lname
-
-End
+END

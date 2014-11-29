@@ -7,18 +7,19 @@ AS
 BEGIN 
 BEGIN TRANSACTION
 
+/* UPDATE THE PRICE TABLE ASSUMING ITS EMPTY */
 INSERT INTO T_PRICE(PRO_ID, PRO_PRICE)
 SELECT PRO_ID, PRO_BASE
-FROM T_PRODUCT
+FROM T_PRODUCT;
+/* ROLLBACK ON ERROR */
+IF @@error <> 0
 
+	BEGIN
+		ROLLBACK TRANSACTION
+		SELECT ' Insert was unsuccessful'
+		RETURN
+	END
+
+COMMIT TRANSACTION;
 SELECT * FROM T_PRODUCT;
-if @@error <> 0
-
-	begin
-		rollback transaction
-		select ' Insert was unsuccessful'
-		return
-	end
-
-commit transaction
 END

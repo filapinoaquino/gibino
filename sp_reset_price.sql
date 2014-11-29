@@ -6,20 +6,20 @@ CREATE PROCEDURE dbo.sp_reset_price
 AS 
 BEGIN 
 BEGIN TRANSACTION
-
+/* RESET PRICES BACK TO THEIR ORIGINAL PRICES */
 UPDATE pri
 SET pri.pro_price = pro.pro_base
 FROM t_price pri INNER JOIN t_product pro
-on pri.pro_id = pro.pro_id;
+ON pri.pro_id = pro.pro_id;
 
-if @@error <> 0
+IF @@error <> 0
 
-	begin
-		rollback transaction
-		select ' Sale was not completed'
-		return
-	end
+	BEGIN
+		ROLLBACK TRANSACTION
+		SELECT ' Sale was NOT completed'
+		RETURN
+	END
 
-commit transaction
+COMMIT TRANSACTION
 SELECT * FROM T_PRICE;
 END

@@ -1,40 +1,40 @@
 use gibino
 
--- drop tables
+-- DROP tables
 IF OBJECT_ID('dbo.t_cus_age', 'U') IS NOT NULL
-drop table dbo.t_cus_age
+DROP TABLE dbo.t_cus_age
 IF OBJECT_ID('dbo.t_acct_sales', 'U') IS NOT NULL
-drop table dbo.t_acct_sales
+DROP TABLE dbo.t_acct_sales
 IF OBJECT_ID('dbo.t_pos_sales', 'U') IS NOT NULL
-drop table dbo.t_pos_sales
+DROP TABLE dbo.t_pos_sales
 IF OBJECT_ID('dbo.t_customer', 'U') IS NOT NULL
-drop table dbo.t_customer
+DROP TABLE dbo.t_customer
 IF OBJECT_ID('dbo.t_price', 'U') IS NOT NULL
-drop table dbo.t_price
+DROP TABLE dbo.t_price
 IF OBJECT_ID('dbo.t_price_adjust', 'U') IS NOT NULL
-drop table dbo.t_price_adjust
+DROP TABLE dbo.t_price_adjust
 IF OBJECT_ID('dbo.t_sales_perc', 'U') IS NOT NULL
-drop table dbo.t_sales_perc
+DROP TABLE dbo.t_sales_perc
 IF OBJECT_ID('dbo.t_sales_info', 'U') IS NOT NULL
-drop table dbo.t_sales_info
+DROP TABLE dbo.t_sales_info
 IF OBJECT_ID('dbo.t_purchase', 'U') IS NOT NULL
-drop table dbo.t_purchase
+DROP TABLE dbo.t_purchase
 +IF OBJECT_ID('dbo.t_price_diff', 'U') IS NOT NULL
-+drop table dbo.t_price_diff
++DROP TABLE dbo.t_price_diff
 IF OBJECT_ID('dbo.t_product', 'U') IS NOT NULL
-drop table dbo.t_product
+DROP TABLE dbo.t_product
 IF OBJECT_ID('dbo.t_vendor', 'U') IS NOT NULL
-drop table dbo.t_vendor
+DROP TABLE dbo.t_vendor
 IF OBJECT_ID('dbo.t_type', 'U') IS NOT NULL
-drop table dbo.t_type
+DROP TABLE dbo.t_type
 
--- create tables
+-- CREATE tables
 IF OBJECT_ID('dbo.t_customer', 'U') IS NOT NULL
-drop table dbo.t_customer
-create table dbo.t_customer
+DROP TABLE dbo.t_customer
+CREATE TABLE dbo.t_customer
 (
-cus_id int 		identity(1,1) 	primary key,
-cus_dob datetime not null,
+cus_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+cus_dob DATETIME NOT null,
 cus_street1 varchar(30),
 cus_street2 varchar(30),
 cus_city varchar(30),
@@ -50,15 +50,15 @@ cus_suffix varchar(5)
 
 
 IF OBJECT_ID('dbo.t_vendor', 'U') IS NOT NULL
-drop table dbo.t_vendor
-create table dbo.t_vendor
+DROP TABLE dbo.t_vendor
+CREATE TABLE dbo.t_vendor
 (
-ven_id int 		identity(1,1) 	primary key,
-ven_name		varchar(30) not null,
-ven_street1		varchar(30) not null,
+ven_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+ven_name		varchar(30) NOT null,
+ven_street1		varchar(30) NOT null,
 ven_street2		varchar(30),
-ven_city		varchar(30) not null,
-ven_state		char(2) not null,
+ven_city		varchar(30) NOT null,
+ven_state		char(2) NOT null,
 ven_zip			numeric(5,0),
 ven_phone		varchar(12),
 ven_email		varchar(50),
@@ -66,98 +66,99 @@ ven_contact		varchar(50)
 );
 
 IF OBJECT_ID('dbo.t_type', 'U') IS NOT NULL
-drop table dbo.t_type
-create table dbo.t_type
+DROP TABLE dbo.t_type
+CREATE TABLE dbo.t_type
 (
-ty_id int 		identity(1,1) 	primary key,
-ty_description	varchar(50) not null,
-ty_restricted	int not null
+ty_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+ty_description	varchar(50) NOT null,
+ty_restricted	INT NOT null
+constraint ty_restricted check (ty_restricted IN (0,1))
 );
 
 IF OBJECT_ID('dbo.t_product', 'U') IS NOT NULL
-drop table dbo.t_product
-create table dbo.t_product
+DROP TABLE dbo.t_product
+CREATE TABLE dbo.t_product
 (
-pro_id int 		identity(1,1) 	primary key,
-pro_name 		varchar(30) 	not null,
-pro_instock		int		not null,
-ty_id		int		foreign key references t_type(ty_id),
-pro_base		numeric(5,2) not null,
-ven_id		int foreign key references t_vendor(ven_id),
+pro_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+pro_name 		varchar(30) 	NOT null,
+pro_instock		INT		NOT null,
+ty_id		INT		FOREIGN KEY REFERENCES t_type(ty_id),
+pro_base		numeric(5,2) NOT null,
+ven_id		INT FOREIGN KEY REFERENCES t_vendor(ven_id),
 constraint pro_instock check (pro_instock >=0)
 );
 
 IF OBJECT_ID('dbo.t_sales_info', 'U') IS NOT NULL
-drop table dbo.t_sales_info
-create table dbo.t_sales_info
+DROP TABLE dbo.t_sales_info
+CREATE TABLE dbo.t_sales_info
 (
-si_id int 		identity(1,1) 	primary key,		
-pro_id	        int			foreign key references dbo.t_product(pro_id),
-qty_sold			int	not null
+si_id INT 		IDENTITY(1,1) 	PRIMARY KEY,		
+pro_id	        INT			FOREIGN KEY REFERENCES dbo.t_product(pro_id),
+qty_sold			INT	NOT null
 
 );
 
 IF OBJECT_ID('dbo.t_sales_perc', 'U') IS NOT NULL
-drop table dbo.t_sales_perc
-create table dbo.t_sales_perc
+DROP TABLE dbo.t_sales_perc
+CREATE TABLE dbo.t_sales_perc
 (
-sp_id int 		identity(1,1) 	primary key,		
-pro_id	        int			foreign key references dbo.t_product(pro_id),
-pct_of_sales			int	not null
+sp_id INT 		IDENTITY(1,1) 	PRIMARY KEY,		
+pro_id	        INT			FOREIGN KEY REFERENCES dbo.t_product(pro_id),
+pct_of_sales			INT	NOT null
 
 );
 
 
 IF OBJECT_ID('dbo.t_price', 'U') IS NOT NULL
-drop table dbo.t_price
-create table dbo.t_price
+DROP TABLE dbo.t_price
+CREATE TABLE dbo.t_price
 (
-pri_id int 		identity(1,1) 	primary key,		
-pro_id	        int			foreign key references t_product(pro_id),
-pro_price			decimal(5,2)	not null,
+pri_id INT 		IDENTITY(1,1) 	PRIMARY KEY,		
+pro_id	        INT			FOREIGN KEY REFERENCES t_product(pro_id),
+pro_price			DECIMAL(5,2)	NOT null,
 constraint pro_price check (pro_price > 0)
 );
 
 
 IF OBJECT_ID('dbo.t_pos_sales', 'U') IS NOT NULL
-drop table dbo.t_pos_sales
-create table dbo.t_pos_sales
+DROP TABLE dbo.t_pos_sales
+CREATE TABLE dbo.t_pos_sales
 (
-pos_id int 		identity(1,1) 	primary key,
-pos_datetime 		datetime 	not null   default getdate(),
-pos_qty 		int 	not null,
-cus_id 			int 		foreign key references t_customer(cus_id),
-pro_id	        int			foreign key references t_product(pro_id),
-pro_price		decimal(5,2)	not null,
-pos_paid		int not null
-constraint pos_paid check (pos_paid in (0,1))
+pos_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+pos_datetime 		DATETIME 	NOT null   default getdate(),
+pos_qty 		INT 	NOT null,
+cus_id 			INT 		FOREIGN KEY REFERENCES t_customer(cus_id),
+pro_id	        INT			FOREIGN KEY REFERENCES t_product(pro_id),
+pro_price		DECIMAL(5,2)	NOT null,
+pos_paid		INT NOT null
+constraint pos_paid check (pos_paid IN (0,1))
 
 );
 
 IF OBJECT_ID('dbo.t_acct_sales', 'U') IS NOT NULL
-drop table dbo.t_acct_sales
-create table dbo.t_acct_sales
+DROP TABLE dbo.t_acct_sales
+CREATE TABLE dbo.t_acct_sales
 (
-acct_id int 		identity(1,1) 	primary key,
-acct_datetime 		datetime 	not null,
-acct_qty 		int 	not null,
-cus_id 			int 		foreign key references t_customer(cus_id),
-pro_id	        int			foreign key references t_product(pro_id),
-acct_price		decimal(5,2)	not null
+acct_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+acct_datetime 		DATETIME 	NOT null,
+acct_qty 		INT 	NOT null,
+cus_id 			INT 		FOREIGN KEY REFERENCES t_customer(cus_id),
+pro_id	        INT			FOREIGN KEY REFERENCES t_product(pro_id),
+acct_price		DECIMAL(5,2)	NOT null
 );
 
 
 
 IF OBJECT_ID('dbo.t_purchase', 'U') IS NOT NULL
-drop table dbo.t_purchase
-create table dbo.t_purchase
+DROP TABLE dbo.t_purchase
+CREATE TABLE dbo.t_purchase
 (
-pur_id int 		identity(1,1) 	primary key,
-pro_id int foreign key references t_product(pro_id),
-ven_id int foreign key references t_vendor(ven_id),
-pur_qty	int not null,
+pur_id INT 		IDENTITY(1,1) 	PRIMARY KEY,
+pro_id INT FOREIGN KEY REFERENCES t_product(pro_id),
+ven_id INT FOREIGN KEY REFERENCES t_vendor(ven_id),
+pur_qty	INT NOT null,
 pur_unt_price	numeric(5,2),
-pur_date	datetime
+pur_date	DATETIME
 
 );
 

@@ -8,20 +8,22 @@ BEGIN
 
 BEGIN TRANSACTION
 
+/* INSERT DATA FROM THE POS TERMINAL INTO THE PERMANENT ACCOUNTING TABLE */
 INSERT INTO T_ACCT_SALES (ACCT_DATETIME, ACCT_QTY, CUS_ID, PRO_ID, ACCT_PRICE)
 SELECT pos_datetime, pos_qty, cus_id, pro_id, pro_price
 FROM T_POS_SALES
 WHERE POS_PAID = 1; 
 
-if @@error <> 0
+/* ROLLBACK ON ERROR */
+IF @@error <> 0
 
-	begin
-		rollback transaction
-		select ' There was a problem migrating the sales information'
-		return
-	end
+	BEGIN
+		ROLLBACK TRANSACTION
+		SELECT ' There was a problem migrating the sales information'
+		RETURN
+	END
 
-commit transaction;
+COMMIT TRANSACTION;
 
 SELECT * FROM T_ACCT_SALES;
 END

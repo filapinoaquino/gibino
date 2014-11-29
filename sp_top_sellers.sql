@@ -5,12 +5,12 @@ GO
 CREATE PROCEDURE dbo.sp_top_sellers
 AS 
 BEGIN
-
-select top 3 pro_name, max(pos_qty) as TopSeller
-from t_pos_sales s 
-inner join t_product p on p.pro_id = s.pro_id
-where Day(pos_datetime) = Day(GetDate())
-group by p.pro_id, pro_name
-order by TopSeller desc;
+/* SELECT TOP 3 SELLING PRODUCTS FOR THE CURRENT DAY */
+SELECT top 3 pro_name, max(pos_qty) AS TopSeller
+FROM t_pos_sales s 
+INNER JOIN t_product p ON p.pro_id = s.pro_id
+WHERE Day(pos_datetime) = Day(GetDate())
+GROUP BY p.pro_id, pro_name
+ORDER BY TopSeller DESC;
 
 END
