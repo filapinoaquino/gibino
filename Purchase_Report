@@ -1,0 +1,62 @@
+--Purchase_Report
+
+IF OBJECT_ID ('Purchase_REPORT', 'P') IS NOT NULL
+    DROP PROCEDURE PURCHASE_REPORT;
+GO
+
+
+CREATE PROCEDURE PURCHASE_REPORT
+@Start_Date datetime,
+@End_Date datetime
+AS
+Begin
+Begin transaction
+if not exists (select *  from t_purchase where pur_date between @Start_Date and @End_Date)
+	Begin
+		Select 'Error! No Report Found'
+				end 
+
+If exists (select * from t_purchase where pur_date between @Start_Date and @End_Date)
+	Begin Try
+   	 SELECT tv.ven_id,tv.ven_name,tp.pur_id,tp.pro_id, sum(tp.pur_qty * tp.pur_unt_price) as Total_Paid,
+	 p.pro_name, p.pro_id
+	 from t_vendor tv join t_purchase tp on tv.ven_id=tp.ven_id 
+	 join t_product p on p.pro_id=tp.pro_id
+	 where tp.pur_date between @Start_Date and @End_Date
+	 group by tv.ven_id,tv.ven_name,tp.pur_id,tp.pro_id, p.pro_name, p.pro_id
+	 order by tv.ven_id;
+
+	
+END TRY
+BEGIN CATCH
+    SELECT 
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() as ErrorState,
+        ERROR_PROCEDURE() as ErrorProcedure,
+        ERROR_LINE() as ErrorLine,
+        ERROR_MESSAGE() as ErrorMessage;
+
+IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+End Catch;
+
+IF @@TRANCOUNT > 0
+    COMMIT TRANSACTION
+END;
+
+
+--Exec Purchase_REPORT @Start_Date='09/10/14',@End_Date='11/21/14'
+
+
+
+
+
+
+
+
+
+
+
+
+
