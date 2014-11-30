@@ -1,0 +1,48 @@
+--Daily Revenue Report
+
+IF OBJECT_ID ('Daily_Revenue_Report', 'P') IS NOT NULL
+    DROP PROCEDURE Daily_Revenue_Report;
+GO
+
+CREATE PROCEDURE Daily_Revenue_Report
+@Sales_date datetime
+
+As
+Begin
+Begin transaction
+
+if not exists (select * from t_Acct_Sales where @Sales_date=acct_datetime)
+	Begin
+		Select 'Error! No Transaction Found.'
+				end 
+If exists (select * from t_Acct_Sales where  @Sales_date=acct_datetime)
+BEGIN TRY
+
+
+Select ta.pro_id,tp.pro_name, Sum(ta.acct_qty*ta.acct_qty) As Net_Sales
+from t_product tp join t_acct_sales ta on ta.pro_id=tp.pro_id
+where @Sales_date=ta.acct_datetime 
+group by ta.pro_id,tp.pro_name
+Order by ta.pro_id
+END TRY
+BEGIN CATCH
+    SELECT 
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() as ErrorState,
+        ERROR_PROCEDURE() as ErrorProcedure,
+        ERROR_LINE() as ErrorLine,
+        ERROR_MESSAGE() as ErrorMessage;
+
+IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+End Catch;
+
+IF @@TRANCOUNT > 0
+    COMMIT TRANSACTION
+	End;
+
+--Exec Daily_Revenue_Report @Sales_date='2014-12-06'
+
+
+
