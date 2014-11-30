@@ -1,0 +1,63 @@
+--Sales_Report
+
+IF OBJECT_ID ('Sales_REPORT', 'P') IS NOT NULL
+    DROP PROCEDURE Sales_REPORT;
+GO
+
+CREATE PROCEDURE Sales_REPORT
+@Start_Date datetime,
+@End_Date datetime
+AS
+Begin
+Begin transaction
+--To check if any transaction occured on given date parameter
+If not exists (select *  from t_POS_Sales where pos_datetime between @Start_Date and @End_Date)
+	Begin
+		Select 'Error! No Report Found'
+	end 
+--If transaction exists select--
+If exists (select * from t_POS_Sales where pos_datetime between @Start_Date and @End_Date)
+	Begin Try
+	
+ SELECT tp.pro_id,tp.pos_qty,SUM(tp.pro_price * tp.pos_qty)as Total_Sales,p.pro_name
+    FROM T_POS_SALES tp
+	join t_product p
+	on tp.pro_id=p.pro_id join t_type tt
+	on p.ty_id=tt.ty_id  
+	where tp.pos_datetime between @Start_Date and @End_Date
+	Group by tp.pro_id,pos_qty,p.pro_name
+	Order by tp.pro_id;
+END TRY
+--Error Check
+BEGIN CATCH
+    SELECT 
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() as ErrorState,
+        ERROR_PROCEDURE() as ErrorProcedure,
+        ERROR_LINE() as ErrorLine,
+        ERROR_MESSAGE() as ErrorMessage;
+
+IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+End Catch;
+
+IF @@TRANCOUNT > 0
+    COMMIT TRANSACTION
+END;
+
+
+--Exec Sales_REPORT @Start_Date='09/11/14',@End_Date='10/10/14'
+
+
+
+
+
+
+
+
+
+
+
+
+
