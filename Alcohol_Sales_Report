@@ -1,0 +1,49 @@
+--Alcohol drinks Sales Report:
+IF OBJECT_ID ('ALCOHOL_SALES_REPORT', 'P') IS NOT NULL
+    DROP PROCEDURE ALCOHOL_SALES_REPORT;
+GO
+
+CREATE PROCEDURE ALCOHOL_SALES_REPORT
+@Start_Date datetime,
+@End_Date datetime
+AS
+Begin
+Begin transaction
+if not exists (select *  from t_POS_Sales where pos_datetime between @Start_Date and @End_Date)
+	Begin
+		Select 'Error! No Report Found'
+				end 
+
+If exists (select * from t_POS_Sales where pos_datetime between @Start_Date and @End_Date)
+	Begin Try
+
+ 	 SELECT tp.pro_id,tp.pos_qty,SUM(tp.pos_paid)as Total_Sales, p.pro_name
+    FROM T_POS_SALES tp
+	join t_product p
+	on tp.pro_id=p.pro_id join t_type tt
+	on p.ty_id=tt.ty_id  
+	where tp.pos_datetime between @Start_Date and @End_Date AND tt.TY_RESTRICTED=1
+	Group by tp.pro_id,pos_qty,p.pro_name
+	Order by tp.pro_id;
+	
+END TRY
+BEGIN CATCH
+    SELECT 
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() as ErrorState,
+        ERROR_PROCEDURE() as ErrorProcedure,
+        ERROR_LINE() as ErrorLine,
+        ERROR_MESSAGE() as ErrorMessage;
+
+IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+End Catch;
+
+IF @@TRANCOUNT > 0
+    COMMIT TRANSACTION
+
+END;
+
+
+--Exec ALCOHOL_SALES_REPORT @Start_Date='09/10/14',@End_Date='09/21/14'
