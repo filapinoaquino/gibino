@@ -1,0 +1,48 @@
+--Profit Report
+
+IF OBJECT_ID ('Profit_Report', 'P') IS NOT NULL
+DROP PROCEDURE Profit_Report;
+GO
+
+CREATE PROCEDURE Profit_Report
+@Start_Date datetime,
+@End_Date datetime
+AS
+Begin
+Begin transaction
+
+if not exists (select *  from t_POS_Sales where pos_datetime between @Start_Date and @End_Date)
+	Begin
+		Select 'Error! No Report Found'
+				end 
+
+If exists (select pro_id from t_POS_Sales where pos_datetime between @Start_Date and @End_Date)
+Begin Try
+	
+	Select tpr.pro_id,tpr.pro_name,  (Sum(ts.pro_price*ts.pos_qty)-sum(tpu.pur_unt_price*ts.pos_qty)) As Net_Profit
+	from t_purchase tpu join t_product tpr on tpr.pro_id=tpu.pro_id join t_pos_sales ts on tpr.pro_id=ts.pro_id
+	where ts.pos_datetime between @Start_Date and @End_Date
+	Group by tpr.pro_id,tpr.pro_name
+	Order by tpr.pro_id;
+END TRY
+BEGIN CATCH
+    SELECT 
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() as ErrorState,
+        ERROR_PROCEDURE() as ErrorProcedure,
+        ERROR_LINE() as ErrorLine,
+        ERROR_MESSAGE() as ErrorMessage;
+
+IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+End Catch;
+
+IF @@TRANCOUNT > 0
+    COMMIT TRANSACTION
+
+
+		End;
+
+
+--Exec Profit_Report @Start_Date='10/10/14',@End_Date='10/21/14'
