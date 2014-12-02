@@ -68,6 +68,7 @@ SELECT p.pro_id, CASE
 				END
 FROM t_sales_perc p;
 
+SELECT * FROM T_PRICE;
 /* UPDATE T_PRICE TABLE */
 UPDATE p
 SET p.pro_price = p.pro_price + pa.price_adjust

@@ -84,8 +84,10 @@ IF EXISTS(SELECT * FROM t_product WHERE pro_id=@pro_id AND ty_id IN (SELECT ty_i
 		END
 		COMMIT TRANSACTION
 	END
-
+select * from t_product where pro_id = 4;
+SELECT * FROM T_POS_SALES;
 BEGIN TRANSACTION
+
 
 /* CREATE A SALE */
 insert into dbo.t_pos_sales(pos_qty, cus_id, pro_id, pos_paid, pro_price) 
@@ -106,7 +108,8 @@ IF @@error <> 0
 
 COMMIT TRANSACTION;
 
+SELECT * FROM t_product where pro_id = 4;
 SELECT * FROM t_pos_sales;
-SELECT   'Sold ', @pur_qty, 'units of ', (SELECT pro_name FROM t_product WHERE pro_id = @pro_id), ' at ', (SELECT pro_price FROM t_price WHERE pro_id = @pro_id), ' each.'
+SELECT   'Sold ', @pur_qty, 'units of ', (SELECT pro_name FROM t_product WHERE pro_id = @pro_id), ' at ', (SELECT pro_price FROM t_price WHERE pro_id = @pro_id), ' each.';
 
 END

@@ -1,4 +1,5 @@
 --exec sp_customer_tab @cus_id = 25
+/* CHECK IF PROCEDURE EXISTS, DROP AND RECREATE IT */
 IF OBJECTPROPERTY(object_id('sp_customer_tab'), N'IsProcedure') = 1
 DROP PROCEDURE [dbo].[sp_customer_tab]
 GO

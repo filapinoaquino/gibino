@@ -6,7 +6,9 @@ GO
 CREATE PROCEDURE dbo.sp_reset_price
 AS 
 BEGIN 
+SELECT * FROM T_PRICE;
 BEGIN TRANSACTION
+
 /* RESET PRICES BACK TO THEIR ORIGINAL PRICES */
 UPDATE pri
 SET pri.pro_price = pro.pro_base
