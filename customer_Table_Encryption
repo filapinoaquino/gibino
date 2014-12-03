@@ -1,0 +1,47 @@
+--Select * from T_customer
+
+IF NOT EXISTS 
+    (SELECT * FROM sys.symmetric_keys WHERE symmetric_key_id = 101)
+    CREATE MASTER KEY ENCRYPTION BY 
+    PASSWORD = 'password123'
+GO
+
+--create certificate
+CREATE CERTIFICATE Customer_email
+   WITH SUBJECT = 'Protect Customer Email';
+GO
+
+CREATE SYMMETRIC KEY CustemailKey1
+    WITH ALGORITHM = TRIPLE_DES_3KEY
+    ENCRYPTION BY CERTIFICATE Customer_email;
+GO
+
+-- Create a column in which to store the encrypted data.
+ALTER TABLE T_customer
+    ADD EncryptedEmail varbinary(max); 
+GO
+
+
+-- Open the symmetric key with which to encrypt the data.
+OPEN SYMMETRIC KEY CustemailKey1
+   DECRYPTION BY CERTIFICATE  Customer_email;
+
+-- update the column with Encrypted value
+
+UPDATE T_customer
+SET EncryptedEmail = EncryptByKey(Key_GUID('CustemailKey1'), cus_email);
+GO
+
+-- To verify the encryption - open the symmetric key with which to decrypt the data.
+OPEN SYMMETRIC KEY CustemailKey1
+   DECRYPTION BY CERTIFICATE Customer_email;
+GO
+
+
+--To verify if decryption works, select original data, encrypted data,and Decrypted data
+SELECT cus_email, EncryptedEmail 
+    AS 'Encrypted Cus_email',
+    CONVERT(varchar, DecryptByKey( EncryptedEmail)) 
+    AS 'Decrypted Cus_email'
+    FROM t_customer;
+GO
